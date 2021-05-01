@@ -11,8 +11,10 @@ public class Employee implements Serializable {
 	private String lastName;
 	private String mailId;
 	private Date empbirthDate;
+	private long mobileNo;
 	private String empAddress;
 	private String empStatus;
+	private Date joinDate;
 
 	public int getEmpId() {
 		return empId;
@@ -62,6 +64,14 @@ public class Employee implements Serializable {
 		this.empbirthDate = empbirthDate;
 	}
 
+	public long getMobileNo() {
+		return mobileNo;
+	}
+
+	public void setMobileNo(long mobileNo) {
+		this.mobileNo = mobileNo;
+	}
+
 	public String getEmpAddress() {
 		return empAddress;
 	}
@@ -78,10 +88,18 @@ public class Employee implements Serializable {
 		this.empStatus = empStatus;
 	}
 
+	public Date getJoinDate() {
+		return joinDate;
+	}
+
+	public void setJoinDate(Date joinDate) {
+		this.joinDate = joinDate;
+	}
+
 	@Override
 	public String toString() {
 		return "Employee [empId=" + empId + ", firstName=" + firstName + ", middleName=" + middleName + ", lastName="
-				+ lastName + ", mailId=" + mailId + ", empbirthDate=" + empbirthDate + ", empAddress=" + empAddress
-				+ ", empStatus=" + empStatus + "]";
+				+ lastName + ", mailId=" + mailId + ", empbirthDate=" + empbirthDate + ", mobileNo=" + mobileNo
+				+ ", empAddress=" + empAddress + ", empStatus=" + empStatus + ", joinDate=" + joinDate + "]";
 	}
 }

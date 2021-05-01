@@ -4,17 +4,14 @@ package org.comp.connection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.comp.util.EmployeeConstant;
 import org.comp.pojo.Employee;
 
 public class EmployeeManagement {
@@ -23,7 +20,7 @@ public class EmployeeManagement {
 	public Map<Integer, String> addEmployee(List<Employee> employee) throws ClassNotFoundException, SQLException {
 
 		Connection con = ConnectionManager.getConnection();
-		String sqlInsert = "INSERT INTO EMPDETAILS(FIRST_NAME,MIDDLE_NAME,LAST_NAME,PERSONAL_MAILID,EMPADDRESS,EMPBIRTH_DATE,EMPSTATUS) VALUES(?,?,?,?,?,?,?)";
+		String sqlInsert = "INSERT INTO EMPDETAILS(FIRST_NAME,MIDDLE_NAME,LAST_NAME,PERSONAL_MAILID,MOBILE_NUMBER,EMPBIRTH_DATE,EMP_ADDRESS,EMP_STATUS,JOINING_DATE) VALUES(?,?,?,?,?,?,?,?,?)";
 
 		PreparedStatement insertStmt = con.prepareStatement(sqlInsert, Statement.RETURN_GENERATED_KEYS);
 		int rowsInsert = 0;
@@ -36,11 +33,15 @@ public class EmployeeManagement {
 			insertStmt.setString(2, employee2.getMiddleName());
 			insertStmt.setString(3, employee2.getLastName());
 			insertStmt.setString(4, employee2.getMailId());
-			insertStmt.setString(5, employee2.getEmpAddress());
+			insertStmt.setLong(5, employee2.getMobileNo());
 
-			java.sql.Date sqlDate = new java.sql.Date(employee2.getEmpbirthDate().getTime());
-			insertStmt.setDate(6, sqlDate);
-			insertStmt.setString(7, employee2.getEmpStatus());
+			java.sql.Date birthDate = new java.sql.Date(employee2.getEmpbirthDate().getTime());
+			insertStmt.setDate(6, birthDate);
+			insertStmt.setString(7, employee2.getEmpAddress());
+			insertStmt.setString(8, employee2.getEmpStatus());
+
+			java.sql.Date joinDate = new java.sql.Date(employee2.getJoinDate().getTime());
+			insertStmt.setDate(9, joinDate);
 			rowsInsert = insertStmt.executeUpdate();
 
 			ResultSet rs = insertStmt.getGeneratedKeys();
@@ -64,13 +65,11 @@ public class EmployeeManagement {
 		StringBuilder sqlUpdate = new StringBuilder();
 		sqlUpdate.append("UPDATE EMPDETAILS SET ");
 
-		List<String> list = new ArrayList<String>();
+		// List<String> list = new ArrayList<String>();
 		int rowsUpdate = 0;
 		Map<Integer, Object> map = new HashMap<Integer, Object>();
 
 		String name = emp.getFirstName() + emp.getMiddleName() + emp.getLastName();
-		// emp.getFirstName() == null && emp.getMiddleName() == null &&
-		// emp.getLastName() == null
 
 		if (name == null && emp.getEmpAddress() == null) {
 			System.out.println("Please Give Either Employee Name or Employee Address:");
@@ -79,6 +78,7 @@ public class EmployeeManagement {
 			sqlUpdate.append(" FIRST_NAME=?");
 			map.put(1, emp.getFirstName());
 		}
+
 		if (emp.getMiddleName() != null) {
 			if (map.size() == 1) {
 				sqlUpdate.append(",");
@@ -92,6 +92,7 @@ public class EmployeeManagement {
 				map.put(2, emp.getMiddleName());
 			}
 		}
+
 		if (emp.getLastName() != null) {
 			if (map.size() >= 1) {
 				sqlUpdate.append(",");
@@ -107,26 +108,31 @@ public class EmployeeManagement {
 			} else if (map.size() == 2)
 				map.put(3, emp.getLastName());
 		}
-		if (emp.getEmpAddress() != null) {
+
+		if (emp.getMailId() != null) {
 			if (map.size() >= 1) {
 				sqlUpdate.append(",");
-				sqlUpdate.append(" EMPADDRESS=?");
+				sqlUpdate.append(" PERSONAL_MAILID=?");
 			} else {
-				// sqlUpdate.append(",");
-				sqlUpdate.append(" EMPADDRESS=?");
+				sqlUpdate.append(" PERSONAL_MAILID=?");
 			}
 			if (map.size() < 1) {
-				map.put(1, emp.getEmpAddress());
-			} else if (map.size() == 1) {
-				map.put(2, emp.getEmpAddress());
-			} else if (map.size() == 2) {
-				map.put(3, emp.getEmpAddress());
-			} else if (map.size() == 3) {
-				map.put(4, emp.getEmpAddress());
-			} else if (map.size() == 4) {
-				map.put(5, emp.getEmpAddress());
+				map.put(1, emp.getMailId());
 			}
 		}
+
+		if (emp.getMobileNo() >= 1) {
+			if (map.size() >= 1) {
+				sqlUpdate.append(",");
+				sqlUpdate.append(" MOBILE_NUMBER=?");
+			} else {
+				sqlUpdate.append(" MOBILE_NUMBER=?");
+			}
+			if (map.size() < 1) {
+				map.put(1, emp.getMobileNo());
+			}
+		}
+
 		if (emp.getEmpbirthDate() != null) {
 			if (map.size() >= 1) {
 				sqlUpdate.append(",");
@@ -153,6 +159,28 @@ public class EmployeeManagement {
 				map.put(6, sqlDate);
 			}
 		}
+
+		if (emp.getEmpAddress() != null) {
+			if (map.size() >= 1) {
+				sqlUpdate.append(",");
+				sqlUpdate.append(" EMPADDRESS=?");
+			} else {
+				// sqlUpdate.append(",");
+				sqlUpdate.append(" EMPADDRESS=?");
+			}
+			if (map.size() < 1) {
+				map.put(1, emp.getEmpAddress());
+			} else if (map.size() == 1) {
+				map.put(2, emp.getEmpAddress());
+			} else if (map.size() == 2) {
+				map.put(3, emp.getEmpAddress());
+			} else if (map.size() == 3) {
+				map.put(4, emp.getEmpAddress());
+			} else if (map.size() == 4) {
+				map.put(5, emp.getEmpAddress());
+			}
+		}
+
 		sqlUpdate.append(" WHERE EMPID=?");
 		PreparedStatement updateStmt = con.prepareStatement(sqlUpdate.toString());
 		if (map.size() == 1) {
@@ -173,6 +201,13 @@ public class EmployeeManagement {
 			updateStmt.setObject(3, map.get(3));
 			updateStmt.setObject(4, map.get(4));
 			updateStmt.setInt(5, emp.getEmpId());
+		} else if (map.size() == 5) {
+			updateStmt.setObject(1, map.get(1));
+			updateStmt.setObject(2, map.get(2));
+			updateStmt.setObject(3, map.get(3));
+			updateStmt.setObject(4, map.get(4));
+			updateStmt.setObject(5, map.get(5));
+			updateStmt.setInt(6, emp.getEmpId());
 		}
 		rowsUpdate = updateStmt.executeUpdate();
 
@@ -200,21 +235,28 @@ public class EmployeeManagement {
 			sqlUpdate.append(" LAST_NAME LIKE '");
 			sqlUpdate.append(emp.getLastName()).append('%').append("'");
 		}
+		try {
 
-		PreparedStatement searchStmt = con.prepareStatement(sqlUpdate.toString());
-		System.out.println(searchStmt.toString());
+			PreparedStatement searchStmt = con.prepareStatement(sqlUpdate.toString());
+			System.out.println(searchStmt.toString());
 
-		ResultSet rs = searchStmt.executeQuery();
+			ResultSet rs = searchStmt.executeQuery();
 
-		while (rs.next()) {
-			int empId = rs.getInt(1);
-			String fullName =(rs.getString(2) + rs.getString(3) + rs.getString(4));
-			String mailId = rs.getString(5);
-			String empAddress = rs.getString(6);
-			String birth = rs.getString(7);
-			String empStatus = rs.getString(8);
+			while (rs.next()) {
+				int empId = rs.getInt(1);
+				String fullName = (rs.getString(2) + rs.getString(3) + rs.getString(4));
+				String mailId = rs.getString(5);
+				long mobileNo = rs.getLong(6);
+				String birthDate = rs.getString(7);
+				String empAddress = rs.getString(8);
+				String empStatus = rs.getString(9);
+				Date joinDate = rs.getDate(10);
 
-			System.out.println("EMPLOYEE DETAILS IS:" + empId + " , " + fullName + " ,"+ mailId + " , " + empAddress + " , " + birth + " , " + empStatus);
+				System.out.println("EMPLOYEE DETAILS IS:" + empId + " , " + fullName + " ," + mailId + " , " + mobileNo
+						+ " , " + birthDate + " , " + empAddress + " , " + empStatus + joinDate);
+			}
+		} catch (Exception e) {
+			System.out.println("Unable to try");
 		}
 	}
 
@@ -223,37 +265,51 @@ public class EmployeeManagement {
 		Connection con = ConnectionManager.getConnection();
 		String sqlSearch = "SELECT * FROM EMPDETAILS WHERE EMPID =?";
 
-		PreparedStatement searchStmt = con.prepareStatement(sqlSearch);
-		searchStmt.setInt(1, emp.getEmpId());
-		// System.out.println(searchStmt.toString());
+		try {
 
-		ResultSet rs = searchStmt.executeQuery();
+			PreparedStatement searchStmt = con.prepareStatement(sqlSearch);
+			searchStmt.setInt(1, emp.getEmpId());
+			// System.out.println(searchStmt.toString());
 
-		while (rs.next()) {
-			int empId = rs.getInt(1);
-			String fullName =(rs.getString(2) + rs.getString(3) + rs.getString(4));
-			String mailId = rs.getString(5);
-			String empAddress = rs.getString(6);
-			String birth = rs.getString(7);
-			String empStatus = rs.getString(8);
+			ResultSet rs = searchStmt.executeQuery();
 
-			System.out.println("EMPLOYEE DETAILS IS:" + empId + " , " + fullName + " , " + mailId + " , " + empAddress
-					+ " , " + birth + " , " + empStatus);
+			while (rs.next()) {
+				int empId = rs.getInt(1);
+				String fullName = (rs.getString(2) + rs.getString(3) + rs.getString(4));
+				String mailId = rs.getString(5);
+				long mobileNo = rs.getLong(6);
+				String empAddress = rs.getString(7);
+				String birthDate = rs.getString(8);
+				String empStatus = rs.getString(9);
+				Date joinDate1 = rs.getDate(10);
+
+				System.out.println("EMPLOYEE DETAILS IS:" + empId + " , " + fullName + " ," + mailId + " , " + mobileNo
+						+ " , " + birthDate + " , " + empAddress + " , " + empStatus + " , " + joinDate1);
+			}
+		} catch (Exception e) {
+			System.out.println("Unable to Search the Employee id");
 		}
+
 	}
 
 	// Deactive Employees
 	public void deActivatedEmployee(Employee emp) throws ClassNotFoundException, SQLException {
+
 		Connection con = ConnectionManager.getConnection();
 		String sqlDelete = "UPDATE EMPDETAILS SET EMPSTATUS=? WHERE EMPID=?";
 
-		PreparedStatement deactivedStmt = con.prepareStatement(sqlDelete);
-		deactivedStmt.setString(1, emp.getEmpStatus());
-		deactivedStmt.setInt(2, emp.getEmpId());
+		try {
 
-		int rowsDelete = deactivedStmt.executeUpdate();
-		if (rowsDelete > 0) {
-			System.out.println("Employee was Deactivated Successfully!");
+			PreparedStatement deactivedStmt = con.prepareStatement(sqlDelete);
+			deactivedStmt.setString(1, emp.getEmpStatus());
+			deactivedStmt.setInt(2, emp.getEmpId());
+
+			int rowsDelete = deactivedStmt.executeUpdate();
+			if (rowsDelete > 0) {
+				System.out.println("Employee was Deactivated Successfully!");
+			}
+		} catch (Exception e) {
+			System.out.println("unable to try");
 		}
 	}
 
@@ -262,22 +318,40 @@ public class EmployeeManagement {
 		Connection con = ConnectionManager.getConnection();
 		String sqlRetrieve = "SELECT * FROM EMPDETAILS";
 
-		PreparedStatement retrieveStmt = con.prepareStatement(sqlRetrieve);
-		ResultSet result = retrieveStmt.executeQuery(sqlRetrieve);
+		try {
+			PreparedStatement retrieveStmt = con.prepareStatement(sqlRetrieve);
+			ResultSet result = retrieveStmt.executeQuery(sqlRetrieve);
 
-		while (result.next()) {
-			int empId = result.getInt(1);
+			// Retrieving the ResultSetMetadata object
+			ResultSetMetaData rsMetaData = result.getMetaData();
 
-			String empFirst = result.getString(2);
-			String empMiddle = result.getString(3);
-			String empLast = result.getString(4);
-			String mailId = result.getString(5);
-			String empAddress = result.getString(6);
-			String birth = result.getString(7);
-			String empStatus = result.getString(8);
+			// Retrieving the list of column names
+			int count = rsMetaData.getColumnCount();
 
-			System.out.println("EMPLOYEE DETAILS IS:" + empId + " , " + empFirst + " , " + empMiddle + " , " + empLast
-					+ " , " + mailId + " , " + empAddress + " , " + birth + " , " + empStatus);
+			// Process the statements
+			for (int i = 1; i <= count; i++) {
+				System.out.print(rsMetaData.getColumnName(i) + "\t");
+			}
+
+			while (result.next()) {
+
+				int empId = result.getInt(1);
+				String firstName = result.getString(2);
+				String middleName = result.getString(3);
+				String lastName = result.getString(4);
+				String mailId = result.getString(5);
+				long mobileNo = result.getLong(6);
+				String empAddress = result.getString(7);
+				String birthDate = result.getString(8);
+				String empStatus = result.getString(9);
+				Date joinDate2 = result.getDate(10);
+
+				System.out.println("\n");
+				System.out.println(empId + firstName + middleName + lastName + mailId + +mobileNo + birthDate
+						+ empAddress + empStatus + joinDate2);
+			}
+		} catch (Exception e) {
+			System.out.println("Unable to retrieve Employee Details .");
 		}
 	}
 }
