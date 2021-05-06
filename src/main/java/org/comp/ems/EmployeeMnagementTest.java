@@ -1,15 +1,16 @@
 package org.comp.ems;
 
-import java.util.Date;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
 import org.comp.connection.EmployeeManagement;
 import org.comp.pojo.Employee;
+import org.comp.util.DateUtil;
 import org.comp.util.ValidateUtil;
 
 public class EmployeeMnagementTest {
@@ -45,12 +46,28 @@ public class EmployeeMnagementTest {
 			String mName = sc.next();
 			System.out.println("Please Enter Employee Last Name:");
 			String lName = sc.next();
-			// String name = fName + mName + lName + sc.nextLine();
+
+			// MailId Validation
 			System.out.println("Please Enter Employee Personal Mailid:");
 			String mailId = sc.next();
+			boolean isValid = ValidateUtil.validateMail(mailId);
 
+			while (!isValid) {
+				System.out.println("Please Enter Your Valid Email ID:");
+				mailId = sc.next();
+				isValid = ValidateUtil.validateMail(mailId);
+			}
+			// Mobile Number Validation
 			System.out.println("Please Enter Employee Mobile Number: ");
 			long mobileNo = sc.nextLong();
+			boolean isValidNo = ValidateUtil.validateMobileNumber(mobileNo);
+
+			while (!isValidNo) {
+				System.out.println("Please Enter Your valid Mobile Number:");
+				mobileNo = sc.nextLong();
+				isValidNo = ValidateUtil.validateMobileNumber(mobileNo);
+			}
+
 			System.out.println("Please Enter Employee Date of Birth: (yyyy-mm-dd)");
 			String dob = sc.next();
 			System.out.println("Please Enter Employee Address: ");
@@ -58,19 +75,38 @@ public class EmployeeMnagementTest {
 			System.out.println("Please Enter Employee's Joining Date : (yyyy-mm-dd)");
 			String joiningDate = sc.next();
 
+			System.out.println("Please Enter The Employee Gender :");
+			System.out.println(".MALE");
+			System.out.println(".FEMALE");
+			System.out.println(".TRANSGENDER");
+			System.out.println("Choose an option:");
+			String gender = sc.next();
+
+			System.out.println("Please Enter Employee's Salary:");
+			Double sal = sc.nextDouble();
+
+			// country validation
+			String[] countries = { "India", "Australia", "Japan", "USA", "UAE", "Canada", "Brazil" };
+			System.out.println("Please Enter Employee's Country:");
+			String country = sc.next();
+			boolean isCountryValid = ValidateUtil.validateCountry(countries, country);
+
+			while (!isCountryValid) {
+				System.out.println("Please Enter your valid Country:");
+				country = sc.next();
+				isCountryValid = ValidateUtil.validateCountry(countries, country);
+			}
+			// DOB Validation
 			Date dateOfBirth = new SimpleDateFormat("yyyy-MM-dd").parse(dob);
 
-			SimpleDateFormat dateJoin = new SimpleDateFormat("yyyy-MM-dd");
-			Date empJoinDate = dateJoin.parse(joiningDate);
+			// Employee JoinDate validation
+			boolean isValidDate = DateUtil.isAfterCurrentDate(joiningDate);
 
-			Date date = new Date();
-			String date1 = dateJoin.format(date);
-			Date currentDate = dateJoin.parse(date1);
-
-			if (empJoinDate.after(currentDate)) {
-				emp.setJoinDate(empJoinDate);
-			} else if (empJoinDate.before(currentDate)) {
-				System.out.println("empJoinDate comes before currentDate");
+			if (isValidDate) {
+				Date joiningDate1 = DateUtil.formatStringToDate(joiningDate, "yyyy-MM-dd");
+				emp.setJoinDate(joiningDate1);
+			} else {
+				System.out.println("invalid joining date");
 			}
 
 			emp.setFirstName(fName);
@@ -78,8 +114,12 @@ public class EmployeeMnagementTest {
 			emp.setLastName(lName);
 			emp.setMailId(mailId);
 			emp.setMobileNo(mobileNo);
-			emp.setEmpAddress(address);
 			emp.setEmpbirthDate(dateOfBirth);
+			emp.setEmpAddress(address);
+			emp.setGender(gender);
+			emp.setSalary(sal);
+			emp.setCountry(country.toUpperCase());
+
 			emp.setEmpStatus("Active");
 
 			employee.add(emp);
@@ -122,55 +162,55 @@ public class EmployeeMnagementTest {
 					emp.setFirstName(firstName);
 					emp.setEmpId(id);
 					emp.setEmpStatus("Active");
-					method.upadteEmployee(emp);
+					method.updateEmployee(emp);
 					break;
 				case 2:
-					System.out.println("Enter your Employee Middle Name For Update:");
+					System.out.println("Enter Your Employee Middle Name For Update:");
 					String middleName = sc.next();
 
 					emp.setMiddleName(middleName);
 					emp.setEmpId(id);
 					emp.setEmpStatus("Active");
-					method.upadteEmployee(emp);
+					method.updateEmployee(emp);
 					break;
 				case 3:
-					System.out.println("Enter your Employee Last Name For Update:");
+					System.out.println("Enter Your Employee Last Name For Update:");
 					String lastName = sc.next();
 
 					emp.setLastName(lastName);
 					emp.setEmpId(id);
 					emp.setEmpStatus("Active");
-					method.upadteEmployee(emp);
+					method.updateEmployee(emp);
 					break;
 				}
 				break;
 			case 2:
-				System.out.println("Enter your Employee Address For Update:");
+				System.out.println("Enter Your Employee Address For Update:");
 				String address1 = sc.next();
 
 				emp.setEmpAddress(address1);
 				emp.setEmpId(id);
 				employee.add(emp);
-				method.upadteEmployee(emp);
+				method.updateEmployee(emp);
 				break;
 			case 3:
-				System.out.println("Enter your Employee Date Of Birth (yyyy-MM-dd) :");
+				System.out.println("Enter Your Employee Date Of Birth (yyyy-MM-dd) :");
 				String birthDate = sc.next();
 
 				Date dateOf = new SimpleDateFormat("yyyy-MM-dd").parse(birthDate);
 				emp.setEmpbirthDate(dateOf);
 				emp.setEmpId(id);
-				method.upadteEmployee(emp);
+				method.updateEmployee(emp);
 				break;
 			case 4:
-				System.out.println("Enter your Personal Email ID:");
+				System.out.println("Enter Your Personal Email ID:");
 				String mail = sc.next();
-				boolean isValid = ValidateUtil.validateMail(mail);
+				boolean isValidMail = ValidateUtil.validateMail(mail);
 
-				while (!isValid) {
-					System.out.println("Please Enter your valid Email ID:");
+				while (!isValidMail) {
+					System.out.println("Please Enter Your Valid Email ID:");
 					mail = sc.next();
-					isValid = ValidateUtil.validateMail(mail);
+					isValidMail = ValidateUtil.validateMail(mail);
 				}
 				/*
 				 * if (isValid) { emp.setMailId(mail); } else { // emp.setMailId(mail);
@@ -178,30 +218,30 @@ public class EmployeeMnagementTest {
 				 */
 				emp.setMailId(mail);
 				emp.setEmpId(id);
-				method.upadteEmployee(emp);
+				method.updateEmployee(emp);
 				break;
 			case 5:
-				System.out.println("Enter your Mobile Number:");
+				System.out.println("Enter Your Mobile Number:");
 				long mobileNo1 = sc.nextLong();
-				boolean isValidNo = ValidateUtil.validateMobileNumber(mobileNo1);
+				boolean isValidNo1 = ValidateUtil.validateMobileNumber(mobileNo1);
 
-				while (!isValidNo) {
-					System.out.println("Please Enter your valid Mobile Number:");
+				while (!isValidNo1) {
+					System.out.println("Please Enter Your valid Mobile Number:");
 					mobileNo1 = sc.nextLong();
-					isValidNo = ValidateUtil.validateMobileNumber(mobileNo1);
+					isValidNo1 = ValidateUtil.validateMobileNumber(mobileNo1);
 				}
 				emp.setMobileNo(mobileNo1);
 				emp.setEmpId(id);
-				method.upadteEmployee(emp);
+				method.updateEmployee(emp);
 				break;
 			case 6:
-				System.out.println("Enter your Employee First Name For Update:");
+				System.out.println("Enter Your Employee First Name For Update:");
 				String uName = sc.next();
-				System.out.println("Enter your Employee Middle Name For Update:");
+				System.out.println("Enter Your Employee Middle Name For Update:");
 				String upName = sc.next();
-				System.out.println("Enter your Employee Last Name For Update:");
+				System.out.println("Enter Your Employee Last Name For Update:");
 				String dName = sc.next();
-				System.out.println("Enter your Employee Address For Update:");
+				System.out.println("Enter Your Employee Address For Update:");
 				String address2 = sc.next();
 
 				emp.setFirstName(uName);
@@ -210,17 +250,17 @@ public class EmployeeMnagementTest {
 
 				emp.setEmpAddress(address2);
 				emp.setEmpId(id);
-				method.upadteEmployee(emp);
+				method.updateEmployee(emp);
 				break;
 
 			case 7:
-				System.out.println("Enter your Employee First Name For Update:");
+				System.out.println("Enter Your Employee First Name For Update:");
 				String name1 = sc.next();
-				System.out.println("Enter your Employee Middle Name For Update:");
+				System.out.println("Enter Your Employee Middle Name For Update:");
 				String name2 = sc.next();
-				System.out.println("Enter your Employee Last Name For Update:");
+				System.out.println("Enter Your Employee Last Name For Update:");
 				String name3 = sc.next();
-				System.out.println("Enter your Employee Date Of Birth(yyyy-MM-dd) :");
+				System.out.println("Enter Your Employee Date Of Birth(yyyy-MM-dd) :");
 				String dateBirth = sc.next();
 
 				Date birth = new SimpleDateFormat("yyyy-MM-dd").parse(dateBirth);
@@ -230,7 +270,7 @@ public class EmployeeMnagementTest {
 				emp.setLastName(name3);
 				emp.setEmpbirthDate(birth);
 				emp.setEmpId(id);
-				method.upadteEmployee(emp);
+				method.updateEmployee(emp);
 				break;
 
 			default:
@@ -252,7 +292,7 @@ public class EmployeeMnagementTest {
 			switch (selectionSearch) {
 			case 1:
 
-				System.out.println("Enter your Employee Id:");
+				System.out.println("Enter Your Employee Id:");
 				int id1 = sc.nextInt();
 				emp.setEmpId(id1);
 				emp.setEmpStatus("Active");
@@ -268,14 +308,14 @@ public class EmployeeMnagementTest {
 				int selectionSearch1 = sc.nextInt();
 				switch (selectionSearch1) {
 				case 1:
-					System.out.println("Enter your Employee First Name For Search:");
+					System.out.println("Enter Your Employee First Name For Search:");
 					String nameSerach = sc.next();
 					emp.setFirstName(nameSerach);
 					emp.setEmpStatus("Active");
 					method.searchEmployeeByName(emp);
 					break;
 				case 2:
-					System.out.println("Enter your Employee Last Name For Search:");
+					System.out.println("Enter Your Employee Last Name For Search:");
 					String nameSerach2 = sc.next();
 					emp.setLastName(nameSerach2);
 					emp.setEmpStatus("Active");
@@ -291,7 +331,7 @@ public class EmployeeMnagementTest {
 
 			System.out.println("4 - Delete Employee");
 			System.out.println("------------------------");
-			System.out.println("Enter your Employee id:");
+			System.out.println("Enter Your Employee id:");
 			int idDeactive = sc.nextInt();
 
 			emp.setEmpId(idDeactive);
@@ -310,11 +350,14 @@ public class EmployeeMnagementTest {
 
 		/*
 		 * Employee emp = new Employee(); Employee emp1 = new Employee(); Employee emp2
-		 * = new Employee();
-		 * 
-		 * emp.setEmpName("Aryasushree Priyadarshini"); emp.setEmpAddress("CUTTACK");
-		 * emp.setStatus("Active"); employee.add(emp1); employee.add(emp2);
+		 * = new Employee(); emp.setEmpName("Aryasushree Priyadarshini");
+		 * emp.setEmpAddress("CUTTACK"); emp.setStatus("Active"); employee.add(emp1);
+		 * employee.add(emp2);
 		 */
+		// break problem
+		// tabular form
+		// Exception
+		// how to add list of employees from console
 
 	}
 }

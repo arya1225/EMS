@@ -20,7 +20,7 @@ public class EmployeeManagement {
 	public Map<Integer, String> addEmployee(List<Employee> employee) throws ClassNotFoundException, SQLException {
 
 		Connection con = ConnectionManager.getConnection();
-		String sqlInsert = "INSERT INTO EMPDETAILS(FIRST_NAME,MIDDLE_NAME,LAST_NAME,PERSONAL_MAILID,MOBILE_NUMBER,EMPBIRTH_DATE,EMP_ADDRESS,EMP_STATUS,JOINING_DATE) VALUES(?,?,?,?,?,?,?,?,?)";
+		String sqlInsert = "INSERT INTO EMPDETAILS(FIRST_NAME,MIDDLE_NAME,LAST_NAME,PERSONAL_MAILID,MOBILE_NUMBER,EMPBIRTH_DATE,EMP_ADDRESS,EMP_STATUS,JOINING_DATE,GENDER,SALARY,COUNTRY) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)";
 
 		PreparedStatement insertStmt = con.prepareStatement(sqlInsert, Statement.RETURN_GENERATED_KEYS);
 		int rowsInsert = 0;
@@ -42,6 +42,9 @@ public class EmployeeManagement {
 
 			java.sql.Date joinDate = new java.sql.Date(employee2.getJoinDate().getTime());
 			insertStmt.setDate(9, joinDate);
+			insertStmt.setString(10, employee2.getGender());
+			insertStmt.setDouble(11, employee2.getSalary());
+			insertStmt.setString(12, employee2.getCountry());
 			rowsInsert = insertStmt.executeUpdate();
 
 			ResultSet rs = insertStmt.getGeneratedKeys();
@@ -51,15 +54,15 @@ public class EmployeeManagement {
 				map.put(generatedKey, empName);
 			}
 		}
-		System.out.println(map);
+		// System.out.println(map);
 		if (rowsInsert > 0) {
-			System.out.println("Employee was inserted successfully!" + generatedKey);
+			System.out.println("Emp Id:" + generatedKey + " was inserted successfully!");
 		}
 		return map;
 	}
 
 	// UPDATE EMPLOYEE
-	public Employee upadteEmployee(Employee emp) throws ClassNotFoundException, SQLException {
+	public Employee updateEmployee(Employee emp) throws ClassNotFoundException, SQLException {
 
 		Connection con = ConnectionManager.getConnection(); // For Dynamic Query Generation
 		StringBuilder sqlUpdate = new StringBuilder();
@@ -251,9 +254,13 @@ public class EmployeeManagement {
 				String empAddress = rs.getString(8);
 				String empStatus = rs.getString(9);
 				Date joinDate = rs.getDate(10);
+				String gender = rs.getString(11);
+				long sal = rs.getLong(12);
+				String country = rs.getString(13);
 
 				System.out.println("EMPLOYEE DETAILS IS:" + empId + " , " + fullName + " ," + mailId + " , " + mobileNo
-						+ " , " + birthDate + " , " + empAddress + " , " + empStatus + joinDate);
+						+ " , " + birthDate + " , " + empAddress + " , " + empStatus + " , " + joinDate + " , " + gender
+						+ " , " + sal + " , " + country);
 			}
 		} catch (Exception e) {
 			System.out.println("Unable to try");
@@ -282,9 +289,13 @@ public class EmployeeManagement {
 				String birthDate = rs.getString(8);
 				String empStatus = rs.getString(9);
 				Date joinDate1 = rs.getDate(10);
+				String gender = rs.getString(11);
+				long sal = rs.getLong(12);
+				String country = rs.getString(13);
 
 				System.out.println("EMPLOYEE DETAILS IS:" + empId + " , " + fullName + " ," + mailId + " , " + mobileNo
-						+ " , " + birthDate + " , " + empAddress + " , " + empStatus + " , " + joinDate1);
+						+ " , " + birthDate + " , " + empAddress + " , " + empStatus + " , " + joinDate1 + " , "
+						+ gender + " , " + sal + " , " + country);
 			}
 		} catch (Exception e) {
 			System.out.println("Unable to Search the Employee id");
