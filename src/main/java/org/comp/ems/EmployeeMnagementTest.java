@@ -75,12 +75,28 @@ public class EmployeeMnagementTest {
 			System.out.println("Please Enter Employee's Joining Date : (yyyy-mm-dd)");
 			String joiningDate = sc.next();
 
+			// Gender Validation
 			System.out.println("Please Enter The Employee Gender :");
-			System.out.println(".MALE");
-			System.out.println(".FEMALE");
-			System.out.println(".TRANSGENDER");
+			System.out.println("1.MALE");
+			System.out.println("2.FEMALE");
+			System.out.println("3.TRANSGENDER");
 			System.out.println("Choose an option:");
-			String gender = sc.next();
+			int selectionGender = sc.nextInt();
+			String gender = null;
+			switch (selectionGender) {
+			case 1:
+				gender = "MALE";
+				break;
+			case 2:
+				gender = "FEMALE";
+				break;
+			case 3:
+				gender = "TRANSGENDER";
+				break;
+			default:
+				System.out.println("Please give valid ");
+				break;
+			}
 
 			System.out.println("Please Enter Employee's Salary:");
 			Double sal = sc.nextDouble();

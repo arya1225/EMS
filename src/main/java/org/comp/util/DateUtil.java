@@ -4,8 +4,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.comp.pojo.Employee;
-
 public class DateUtil {
 
 	public static boolean isAfterCurrentDate(String joiningDate) throws ParseException {
@@ -17,16 +15,16 @@ public class DateUtil {
 		Date date = new Date();
 		String date1 = dateJoin.format(date);
 		Date currentDate = dateJoin.parse(date1);
-		boolean isAfter = empJoinDate.after(currentDate);
-		return isAfter;
-
+		// boolean isAfter = empJoinDate.after(currentDate);
+		if (empJoinDate.equals(currentDate) || empJoinDate.after(currentDate)) {
+			return currentDate.to;
+		}
 	}
+
 
 	public static Date formatStringToDate(String date, String format) throws ParseException {
 
 		Date formattedDate = new SimpleDateFormat(format).parse(date);
-
 		return formattedDate;
-
 	}
 }
